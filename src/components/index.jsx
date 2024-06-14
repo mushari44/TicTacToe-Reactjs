@@ -27,6 +27,7 @@ export default function TicTacToe() {
         setSquares(game.squares);
         setGameId(game._id);
         setIsXTurn(game.isXTurn);
+        setGameOver(game.isGameOver);
         if (!gameOver) setMessage(`Next turn is ${game.isXTurn ? "X" : "O"}`);
       }
     } catch (error) {
@@ -36,6 +37,18 @@ export default function TicTacToe() {
 
   useEffect(() => {
     if (!gameOver) fetchGame();
+    else {
+      const winner = getWinner(squares);
+      if (winner) {
+        setMessage(`${winner} won!!`);
+        setGameOver(true);
+      } else if (!squares.includes("")) {
+        setMessage("DRAW !");
+        setGameOver(true);
+      } else {
+        setMessage(`Next turn is ${squares ? "X" : "O"}`);
+      }
+    }
   });
 
   async function handleOnClick(index) {
@@ -54,17 +67,6 @@ export default function TicTacToe() {
         });
       } catch (error) {
         console.log("Error updating game:", error);
-      }
-
-      const winner = getWinner(newSquares);
-      if (winner) {
-        setMessage(`${winner} won!!`);
-        setGameOver(true);
-      } else if (!newSquares.includes("")) {
-        setMessage("DRAW !");
-        setGameOver(true);
-      } else {
-        setMessage(`Next turn is ${newTurn ? "X" : "O"}`);
       }
     } else if (!gameOver) {
       setMessage("Square already clicked");

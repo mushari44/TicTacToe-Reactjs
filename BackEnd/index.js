@@ -24,6 +24,10 @@ const gameSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  isGameOver: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Game = mongoose.model("Game", gameSchema);
@@ -51,6 +55,7 @@ app.put("/restart-game", async (req, res) => {
     if (game) {
       game.squares = Array(9).fill("");
       game.isXTurn = true;
+      game.isGameOver = false;
       await game.save();
       res.status(200).json(game);
     } else {
@@ -62,13 +67,15 @@ app.put("/restart-game", async (req, res) => {
 });
 
 app.put("/update-game", async (req, res) => {
-  const { id, squares, isXTurn } = req.body;
+  const { id, squares, isXTurn, isGameOver } = req.body;
   try {
     const game = await Game.findById(id);
     if (game) {
       game.squares = squares;
       game.isXTurn = isXTurn;
+      game.isGameOver = isGameOver;
       await game.save();
+
       res.status(200).json(game);
     } else {
       res.status(404).json({ error: "Game not found" });
