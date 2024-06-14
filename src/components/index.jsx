@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { io } from "socket.io-client";
 import "./styles.css";
 
 function Square({ value, onClick }) {
@@ -16,40 +17,67 @@ export default function TicTacToe() {
   const [message, setMessage] = useState("Next turn is X");
   const [gameOver, setGameOver] = useState(false);
   const [gameId, setGameId] = useState(null);
-
-  async function fetchGame() {
-    try {
-      const response = await axios.get(
-        "https://tic-tac-toe-server1.vercel.app/"
-      );
-      const game = response.data[0];
-      if (game) {
-        setSquares(game.squares);
-        setGameId(game._id);
-        setIsXTurn(game.isXTurn);
-        setGameOver(game.isGameOver);
-        if (!gameOver) setMessage(`Next turn is ${game.isXTurn ? "X" : "O"}`);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  const socket = io("https://tic-tac-toe-server1.vercel.app");
 
   useEffect(() => {
-    if (!gameOver) fetchGame();
-    else {
-      const winner = getWinner(squares);
-      if (winner) {
-        setMessage(`${winner} won!!`);
-        setGameOver(true);
-      } else if (!squares.includes("")) {
-        setMessage("DRAW !");
-        setGameOver(true);
-      } else {
-        setMessage(`Next turn is ${squares ? "X" : "O"}`);
+    async function fetchGame() {
+      try {
+        const response = await axios.get(
+          "https://tic-tac-toe-server1.vercel.app/"
+        );
+        const game = response.data[0];
+        if (game) {
+          setSquares(game.squares);
+          setGameId(game._id);
+          setIsXTurn(game.isXTurn);
+          setGameOver(game.isGameOver);
+          if (!game.isGameOver) {
+            setMessage(`Next turn is ${game.isXTurn ? "X" : "O"}`);
+          } else {
+            setMessage(
+              game.squares.includes("")
+                ? "Square already clicked"
+                : "Game OVER !"
+            );
+          }
+        }
+      } catch (error) {
+        console.log(error);
       }
     }
-  });
+
+    fetchGame();
+
+    socket.on("gameUpdated", (game) => {
+      setSquares(game.squares);
+      setIsXTurn(game.isXTurn);
+      setGameOver(game.isGameOver);
+      if (!game.isGameOver) {
+        setMessage(`Next turn is ${game.isXTurn ? "X" : "O"}`);
+      } else {
+        setMessage(
+          game.squares.includes("") ? "Square already clicked" : "Game OVER !"
+        );
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const winner = getWinner(squares);
+    if (winner) {
+      setMessage(`${winner} won!!`);
+      setGameOver(true);
+    } else if (!squares.includes("")) {
+      setMessage("DRAW !");
+      setGameOver(true);
+    } else {
+      setMessage(`Next turn is ${isXTurn ? "X" : "O"}`);
+    }
+  }, [squares]);
 
   async function handleOnClick(index) {
     if (!gameOver && squares[index] === "") {
@@ -64,6 +92,7 @@ export default function TicTacToe() {
           id: gameId,
           squares: newSquares,
           isXTurn: newTurn,
+          isGameOver: !!getWinner(newSquares) || !newSquares.includes(""),
         });
       } catch (error) {
         console.log("Error updating game:", error);
@@ -110,6 +139,7 @@ export default function TicTacToe() {
       console.log("Error restarting game:", error);
     }
   }
+
   return (
     <div className="tic-tac-toe-container">
       <div>{message && <h1>{message}</h1>}</div>

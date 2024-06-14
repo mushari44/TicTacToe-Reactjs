@@ -1,10 +1,19 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
+
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 const mongoURI =
-  process.env.MONGODB_URI ||
   "mongodb+srv://musharizh56:admin@cluster0.clvs4os.mongodb.net/TicTacToe";
 mongoose
   .connect(mongoURI)
@@ -57,6 +66,7 @@ app.put("/restart-game", async (req, res) => {
       game.isXTurn = true;
       game.isGameOver = false;
       await game.save();
+      io.emit("gameUpdated", game);
       res.status(200).json(game);
     } else {
       res.status(404).json({ error: "Game not found" });
@@ -75,7 +85,7 @@ app.put("/update-game", async (req, res) => {
       game.isXTurn = isXTurn;
       game.isGameOver = isGameOver;
       await game.save();
-
+      io.emit("gameUpdated", game);
       res.status(200).json(game);
     } else {
       res.status(404).json({ error: "Game not found" });
@@ -85,7 +95,14 @@ app.put("/update-game", async (req, res) => {
   }
 });
 
+io.on("connection", (socket) => {
+  console.log("A user connected");
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
+
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
