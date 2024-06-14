@@ -18,9 +18,16 @@ const gameSchema = new mongoose.Schema({
     type: [String],
     default: Array(9).fill(""),
   },
+  isXTurn: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const Game = mongoose.model("Game", gameSchema);
+
+const newGame = new Game({});
+newGame.save();
 app.use(cors());
 app.use(express.json());
 app.get("/", async (req, res) => {
@@ -36,6 +43,7 @@ app.put("/restart-game", async (req, res) => {
     const game = await Game.findOne();
     if (game) {
       game.squares = Array(9).fill("");
+      game.isXTurn = true;
       await game.save();
       res.status(200).json(game);
     } else {
@@ -46,11 +54,12 @@ app.put("/restart-game", async (req, res) => {
   }
 });
 app.put("/update-game", async (req, res) => {
-  const { id, squares } = req.body;
+  const { id, squares, isXTurn } = req.body;
   try {
     const game = await Game.findById(id);
     if (game) {
       game.squares = squares;
+      game.isXTurn = isXTurn;
       await game.save();
       res.status(200).json(game);
     } else {

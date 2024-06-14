@@ -19,11 +19,14 @@ export default function TicTacToe() {
 
   async function fetchGame() {
     try {
-      const response = await axios.get("http://127.0.0.1:4000/");
+      const response = await axios.get(
+        "https://tic-tac-toe-server1.vercel.app/"
+      );
       const game = response.data[0]; // Assuming you want the first game
       if (game) {
         setSquares(game.squares);
         setSquareId(game._id);
+        setIsXTurn(game.isXTurn);
       }
     } catch (error) {
       console.log(error);
@@ -36,11 +39,13 @@ export default function TicTacToe() {
       const newSquares = [...squares];
       newSquares[index] = isXTurn ? "X" : "O";
       setSquares(newSquares);
-      setIsXTurn(!isXTurn);
+      const newTurn = !isXTurn;
+      setIsXTurn(newTurn);
       try {
-        await axios.put("http://127.0.0.1:4000/update-game", {
+        await axios.put("https://tic-tac-toe-server1.vercel.app/update-game", {
           id: squareId,
           squares: newSquares,
+          isXTurn: newTurn,
         });
       } catch (error) {
         console.log("Error updating game:", error);
@@ -89,7 +94,7 @@ export default function TicTacToe() {
     fetchGame();
   });
   async function handleRestart() {
-    await axios.put("http://127.0.0.1:4000/restart-game");
+    await axios.put("https://tic-tac-toe-server1.vercel.app/restart-game");
     setIsXTurn(true);
     setGameOver(false);
     setMessage("Next turn is X");
