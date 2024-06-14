@@ -15,24 +15,28 @@ export default function TicTacToe() {
   const [isXTurn, setIsXTurn] = useState(true);
   const [message, setMessage] = useState("Next turn is X");
   const [gameOver, setGameOver] = useState(false);
-  const [squareId, setSquareId] = useState(null);
+  const [gameId, setGameId] = useState(null);
 
   async function fetchGame() {
     try {
       const response = await axios.get(
         "https://tic-tac-toe-server1.vercel.app/"
       );
-      const game = response.data[0]; // Assuming you want the first game
+      const game = response.data[0];
       if (game) {
         setSquares(game.squares);
-        setSquareId(game._id);
+        setGameId(game._id);
         setIsXTurn(game.isXTurn);
+        if (!gameOver) setMessage(`Next turn is ${game.isXTurn ? "X" : "O"}`);
       }
     } catch (error) {
       console.log(error);
-    } finally {
     }
   }
+
+  useEffect(() => {
+    if (!gameOver) fetchGame();
+  });
 
   async function handleOnClick(index) {
     if (!gameOver && squares[index] === "") {
@@ -41,9 +45,10 @@ export default function TicTacToe() {
       setSquares(newSquares);
       const newTurn = !isXTurn;
       setIsXTurn(newTurn);
+
       try {
         await axios.put("https://tic-tac-toe-server1.vercel.app/update-game", {
-          id: squareId,
+          id: gameId,
           squares: newSquares,
           isXTurn: newTurn,
         });
@@ -59,7 +64,7 @@ export default function TicTacToe() {
         setMessage("DRAW !");
         setGameOver(true);
       } else {
-        setMessage(`Next turn is ${!isXTurn ? "X" : "O"}`);
+        setMessage(`Next turn is ${newTurn ? "X" : "O"}`);
       }
     } else if (!gameOver) {
       setMessage("Square already clicked");
@@ -90,15 +95,18 @@ export default function TicTacToe() {
     return null;
   }
 
-  useEffect(() => {
-    fetchGame();
-  });
   async function handleRestart() {
-    await axios.put("https://tic-tac-toe-server1.vercel.app/restart-game");
-    setIsXTurn(true);
-    setGameOver(false);
-    setMessage("Next turn is X");
-    setSquares(Array(9).fill(""));
+    try {
+      await axios.put("https://tic-tac-toe-server1.vercel.app/restart-game", {
+        id: gameId,
+      });
+      setIsXTurn(true);
+      setGameOver(false);
+      setMessage("Next turn is X");
+      setSquares(Array(9).fill(""));
+    } catch (error) {
+      console.log("Error restarting game:", error);
+    }
   }
   return (
     <div className="tic-tac-toe-container">

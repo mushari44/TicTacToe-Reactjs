@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
+
 const mongoURI =
   process.env.MONGODB_URI ||
   "mongodb+srv://musharizh56:admin@cluster0.clvs4os.mongodb.net/TicTacToe";
@@ -13,6 +14,7 @@ mongoose
   .catch((error) => {
     console.error("Error connecting to MongoDB:", error);
   });
+
 const gameSchema = new mongoose.Schema({
   squares: {
     type: [String],
@@ -26,21 +28,26 @@ const gameSchema = new mongoose.Schema({
 
 const Game = mongoose.model("Game", gameSchema);
 
-const newGame = new Game({});
-newGame.save();
 app.use(cors());
 app.use(express.json());
+
 app.get("/", async (req, res) => {
   try {
-    const game = await Game.find({});
-    res.send(game);
+    let game = await Game.findOne();
+    if (!game) {
+      game = new Game();
+      await game.save();
+    }
+    res.status(200).json([game]);
   } catch (error) {
-    res.status(500).json({ error: "Error fetching games" });
+    res.status(500).json({ error: "Error fetching game" });
   }
 });
+
 app.put("/restart-game", async (req, res) => {
+  const { id } = req.body;
   try {
-    const game = await Game.findOne();
+    const game = await Game.findById(id);
     if (game) {
       game.squares = Array(9).fill("");
       game.isXTurn = true;
@@ -53,6 +60,7 @@ app.put("/restart-game", async (req, res) => {
     res.status(500).json({ error: "Error updating game" });
   }
 });
+
 app.put("/update-game", async (req, res) => {
   const { id, squares, isXTurn } = req.body;
   try {

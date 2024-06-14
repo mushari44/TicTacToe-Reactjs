@@ -85,3 +85,37 @@ body {
   outline: none; /* Remove default outline on focus */
   box-shadow: 5px 5px #454545; /* Green shadow on focus */
 }
+
+/* Media Queries for Mobile Devices */
+@media (max-width: 768px) {
+  .square {
+    width: 100px;
+    height: 100px;
+    font-size: 30px;
+    margin: 2px;
+  }
+
+  .restart-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .square {
+    width: 80px;
+    height: 80px;
+    font-size: 24px;
+    margin: 1px;
+  }
+
+  .restart-button {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+
+  .tic-tac-toe-container {
+    padding: 10px;
+  }
+}
+  
