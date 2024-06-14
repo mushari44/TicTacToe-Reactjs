@@ -26,7 +26,7 @@ app.use(express.json());
 app.get("/", async (req, res) => {
   try {
     const game = await Game.find({});
-    res.send(game.squares);
+    res.send("connected to the tic tac toe serve");
   } catch (error) {
     res.status(500).json({ error: "Error fetching games" });
   }
@@ -62,7 +62,6 @@ app.put("/update-game", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, (req, res) => {
-  res.send("Connected to the server");
+app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
