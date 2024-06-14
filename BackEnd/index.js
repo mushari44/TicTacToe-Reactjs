@@ -26,7 +26,7 @@ app.use(express.json());
 app.get("/", async (req, res) => {
   try {
     const game = await Game.find({});
-    res.send("connected to the tic tac toe serve");
+    res.send(game);
   } catch (error) {
     res.status(500).json({ error: "Error fetching games" });
   }
