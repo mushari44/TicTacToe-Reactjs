@@ -11,11 +11,10 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
-
 const mongoURI =
   "mongodb+srv://musharizh56:admin@cluster0.clvs4os.mongodb.net/TicTacToe";
 mongoose
-  .connect(mongoURI)
+  .connect(process.env.MONGODB_URI || mongoURI)
   .then(() => {
     console.log("Connected to MongoDB");
   })
