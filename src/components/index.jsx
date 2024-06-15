@@ -3,6 +3,8 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import "./styles.css";
 
+const socket = io("https://tic-tac-toe-server1.vercel.app");
+
 function Square({ value, onClick }) {
   return (
     <button className="square" onClick={onClick}>
@@ -17,11 +19,11 @@ export default function TicTacToe() {
   const [message, setMessage] = useState("Next turn is X");
   const [gameOver, setGameOver] = useState(false);
   const [gameId, setGameId] = useState(null);
-  const socket = io("https://tic-tac-toe-server1.vercel.app");
 
   useEffect(() => {
     async function fetchGame() {
       try {
+         
         const response = await axios.get(
           "https://tic-tac-toe-server1.vercel.app/"
         );
@@ -31,15 +33,11 @@ export default function TicTacToe() {
           setGameId(game._id);
           setIsXTurn(game.isXTurn);
           setGameOver(game.isGameOver);
-          if (!game.isGameOver) {
-            setMessage(`Next turn is ${game.isXTurn ? "X" : "O"}`);
-          } else {
-            setMessage(
-              game.squares.includes("")
-                ? "Square already clicked"
-                : "Game OVER !"
-            );
-          }
+          setMessage(
+            game.isGameOver
+              ? "Game OVER!"
+              : `Next turn is ${game.isXTurn ? "X" : "O"}`
+          );
         }
       } catch (error) {
         console.log(error);
@@ -52,17 +50,15 @@ export default function TicTacToe() {
       setSquares(game.squares);
       setIsXTurn(game.isXTurn);
       setGameOver(game.isGameOver);
-      if (!game.isGameOver) {
-        setMessage(`Next turn is ${game.isXTurn ? "X" : "O"}`);
-      } else {
-        setMessage(
-          game.squares.includes("") ? "Square already clicked" : "Game OVER !"
-        );
-      }
+      setMessage(
+        game.isGameOver
+          ? "Game OVER!"
+          : `Next turn is ${game.isXTurn ? "X" : "O"}`
+      );
     });
 
     return () => {
-      socket.disconnect();
+      socket.off("gameUpdated");
     };
   }, []);
 

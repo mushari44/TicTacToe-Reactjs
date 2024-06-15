@@ -103,6 +103,6 @@ io.on("connection", (socket) => {
 });
 
 const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => {
+server.listen(4000, () => {
   console.log(`Server started on port ${PORT}`);
 });
