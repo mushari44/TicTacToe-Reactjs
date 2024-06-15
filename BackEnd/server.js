@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
-
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -21,7 +20,7 @@ mongoose
     console.log("Connected to MongoDB");
   })
   .catch((error) => {
-    console.error("Error connecting to MongoDB:", error);
+    console.error("Error connecting to MongoDB: ", error);
   });
 
 const gameSchema = new mongoose.Schema({
