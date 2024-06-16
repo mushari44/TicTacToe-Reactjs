@@ -34,7 +34,7 @@ export default function TicTacToe() {
           setGameOver(game.isGameOver);
           setMessage(
             game.isGameOver
-              ? "Game OVER!"
+              ? "Game OVER!!"
               : `Next turn is ${game.isXTurn ? "X" : "O"}`
           );
         }
