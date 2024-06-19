@@ -1,12 +1,14 @@
-const connectToDatabase = require("./connect");
-const Game = require("./gameModel"); // Your mongoose model
+const Game = require("./index");
 
 module.exports = async (req, res) => {
-  await connectToDatabase();
-  let game = await Game.findOne();
-  if (!game) {
-    game = new Game();
-    await game.save();
+  try {
+    let game = await Game.findOne();
+    if (!game) {
+      game = new Game();
+      await game.save();
+    }
+    res.status(200).json([game]);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching game" });
   }
-  res.status(200).json([game]);
 };
