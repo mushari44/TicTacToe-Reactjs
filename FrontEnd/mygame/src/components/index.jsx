@@ -3,7 +3,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import "./styles.css";
 
-const socket = io("http://3.85.131.175:4000");
+const socket = io("https://tic-tac-toe-server.mushari-alothman.uk/");
 
 function Square({ value, onClick }) {
   return (
@@ -23,7 +23,9 @@ export default function TicTacToe() {
   useEffect(() => {
     async function fetchGame() {
       try {
-        const response = await axios.get("http://3.85.131.175:4000/");
+        const response = await axios.get(
+          "https://tic-tac-toe-server.mushari-alothman.uk/"
+        );
         const game = response.data[0];
         if (game) {
           setSquares(game.squares);
@@ -81,12 +83,15 @@ export default function TicTacToe() {
       setIsXTurn(newTurn);
 
       try {
-        await axios.put("http://3.85.131.175:4000/update-game", {
-          id: gameId,
-          squares: newSquares,
-          isXTurn: newTurn,
-          isGameOver: !!getWinner(newSquares) || !newSquares.includes(""),
-        });
+        await axios.put(
+          "https://tic-tac-toe-server.mushari-alothman.uk/update-game",
+          {
+            id: gameId,
+            squares: newSquares,
+            isXTurn: newTurn,
+            isGameOver: !!getWinner(newSquares) || !newSquares.includes(""),
+          }
+        );
       } catch (error) {
         console.log("Error updating game:", error);
       }
@@ -121,9 +126,12 @@ export default function TicTacToe() {
 
   async function handleRestart() {
     try {
-      await axios.put("http://3.85.131.175:4000/restart-game", {
-        id: gameId,
-      });
+      await axios.put(
+        "https://tic-tac-toe-server.mushari-alothman.uk/restart-game",
+        {
+          id: gameId,
+        }
+      );
       setIsXTurn(true);
       setGameOver(false);
       setMessage("Next turn is X");
