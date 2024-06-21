@@ -10,10 +10,25 @@ app.use(express.json());
 const server = http.createServer(app);
 const allowedOrigins = [
   "http://localhost:3000", // Your frontend local development URL
-  "https://tictactoe.mushari-alothman.uk/*", // Your frontend deployment URL
-  "https://mushari-tic-tac-toe.vercel.app/*",
-  "https://tic-tac-toe-server1.vercel.app/*",
+  "https://tictactoe.mushari-alothman.uk/", // Your frontend deployment URL
+  "https://tic-tac-toe-server1-a977e7db17f2.herokuapp.com/",
+  "https://tic-tac-toe-server1-a977e7db17f2.herokuapp.com/socket.io/",
 ];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT"], // Add other methods your frontend uses
+  allowedHeaders: ["Content-Type"],
+  credentials: true, // Enable credentials (cookies, authorization headers) cross-origin
+};
+
+app.use(cors(corsOptions));
 
 const io = new Server(server, {
   cors: {
@@ -63,6 +78,7 @@ const Game = mongoose.model("Game", gameSchema);
 
 app.get("/", async (req, res) => {
   try {
+    console.log("HELLO");
     let game = await Game.findOne();
     if (!game) {
       game = new Game();
