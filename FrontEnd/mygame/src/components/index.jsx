@@ -3,7 +3,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import "./styles.css";
 
-const socket = io("https://tic-tac-toe-server.mushari-alothman.uk/");
+const socket = io("https://tic-tac-toe-server1.vercel.app");
 
 function Square({ value, onClick }) {
   return (
@@ -24,7 +24,7 @@ export default function TicTacToe() {
     async function fetchGame() {
       try {
         const response = await axios.get(
-          "https://tic-tac-toe-server.mushari-alothman.uk/"
+          "https://tic-tac-toe-server1.vercel.app"
         );
         const game = response.data[0];
         if (game) {
@@ -83,15 +83,12 @@ export default function TicTacToe() {
       setIsXTurn(newTurn);
 
       try {
-        await axios.put(
-          "https://tic-tac-toe-server.mushari-alothman.uk/update-game",
-          {
-            id: gameId,
-            squares: newSquares,
-            isXTurn: newTurn,
-            isGameOver: !!getWinner(newSquares) || !newSquares.includes(""),
-          }
-        );
+        await axios.put("https://tic-tac-toe-server1.vercel.app/update-game", {
+          id: gameId,
+          squares: newSquares,
+          isXTurn: newTurn,
+          isGameOver: !!getWinner(newSquares) || !newSquares.includes(""),
+        });
       } catch (error) {
         console.log("Error updating game:", error);
       }
@@ -126,12 +123,9 @@ export default function TicTacToe() {
 
   async function handleRestart() {
     try {
-      await axios.put(
-        "https://tic-tac-toe-server.mushari-alothman.uk/restart-game",
-        {
-          id: gameId,
-        }
-      );
+      await axios.put("https://tic-tac-toe-server1.vercel.app/restart-game", {
+        id: gameId,
+      });
       setIsXTurn(true);
       setGameOver(false);
       setMessage("Next turn is X");
