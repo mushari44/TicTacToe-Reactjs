@@ -9,8 +9,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "*",
-    methods: ["Access-Control-Allow-Methods", "GET", "POST", "PUT"],
-    headers: ["Origin", " X-Requested-With", "Content-Type", "Accept"],
+    methods: ["GET", "POST", "PUT"],
   },
 });
 
@@ -113,7 +112,7 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
