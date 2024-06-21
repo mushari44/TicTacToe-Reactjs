@@ -78,7 +78,6 @@ const Game = mongoose.model("Game", gameSchema);
 
 app.get("/", async (req, res) => {
   try {
-    console.log("HELLO");
     let game = await Game.findOne();
     if (!game) {
       game = new Game();
