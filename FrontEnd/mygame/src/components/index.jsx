@@ -3,7 +3,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import "./styles.css";
 
-const socket = io("https://tic-tac-toe-server1-a977e7db17f2.herokuapp.com/");
+const socket = io("https://tic-tac-toe-server1-a977e7db17f2.herokuapp.com");
 
 function Square({ value, onClick }) {
   return (
