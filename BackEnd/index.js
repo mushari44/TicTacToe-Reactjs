@@ -10,7 +10,7 @@ const allowedOrigins = [
   "http://localhost:3000", // Your frontend local development URL
   "https://tictactoe.mushari-alothman.uk/", // Your frontend deployment URL
   "https://mushari-tic-tac-toe.vercel.app/",
-  "https://tic-tac-toe-server1.vercel.app",
+  "https://tic-tac-toe-server1.vercel.app/",
   "https://tic-tac-toe-server.mushari-alothman.uk",
 ];
 app.use(cors());
