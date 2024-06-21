@@ -3,7 +3,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import "./styles.css";
 
-const socket = io("https://tic-tac-toe-reactjs-xi.vercel.app");
+const socket = io("https://tic-tac-toe-server1-a977e7db17f2.herokuapp.com");
 
 function Square({ value, onClick }) {
   return (
@@ -24,7 +24,7 @@ export default function TicTacToe() {
     async function fetchGame() {
       try {
         const response = await axios.get(
-          "https://tic-tac-toe-reactjs-xi.vercel.app/"
+          "https://tic-tac-toe-server1-a977e7db17f2.herokuapp.com/"
         );
         const game = response.data[0];
         if (game) {
@@ -85,7 +85,7 @@ export default function TicTacToe() {
 
       try {
         await axios.put(
-          "https://tic-tac-toe-reactjs-xi.vercel.app/update-game",
+          "https://tic-tac-toe-server1-a977e7db17f2.herokuapp.com/update-game",
           {
             id: gameId,
             squares: newSquares,
@@ -94,7 +94,7 @@ export default function TicTacToe() {
           }
         );
       } catch (error) {
-        console.log("Error updating game: ", error);
+        console.log("Error updating game:", error);
       }
     } else if (!gameOver) {
       setMessage("Square already clicked");
@@ -128,7 +128,7 @@ export default function TicTacToe() {
   async function handleRestart() {
     try {
       await axios.put(
-        "https://tic-tac-toe-reactjs-xi.vercel.app/restart-game",
+        "https://tic-tac-toe-server1-a977e7db17f2.herokuapp.com/restart-game",
         {
           id: gameId,
         }
