@@ -6,9 +6,9 @@ const { Server } = require("socket.io");
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const server = http.createServer(app);
-app.use(cors(corsOptions));
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -16,6 +16,13 @@ const io = new Server(server, {
     allowedHeaders: ["Content-Type"],
     credentials: true,
   },
+});
+io.on("connection", (socket) => {
+  console.log("A user connected");
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
 });
 
 const mongoURI =
@@ -99,13 +106,6 @@ app.put("/update-game", async (req, res) => {
   }
 });
 
-io.on("connection", (socket) => {
-  console.log("A user connected");
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
-});
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
