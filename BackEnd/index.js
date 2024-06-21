@@ -5,6 +5,9 @@ const http = require("http");
 const { Server } = require("socket.io");
 
 const app = express();
+app.use(express.json());
+app.use(cors());
+
 const server = http.createServer(app);
 const allowedOrigins = [
   "http://localhost:3000", // Your frontend local development URL
@@ -13,7 +16,6 @@ const allowedOrigins = [
   "https://tic-tac-toe-server1.vercel.app/",
   "https://tic-tac-toe-server.mushari-alothman.uk",
 ];
-app.use(cors());
 
 const io = new Server(server, {
   cors: {
@@ -52,8 +54,6 @@ const gameSchema = new mongoose.Schema({
 });
 
 const Game = mongoose.model("Game", gameSchema);
-
-app.use(express.json());
 
 app.get("/", async (req, res) => {
   try {
