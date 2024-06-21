@@ -6,12 +6,21 @@ const { Server } = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
+const allowedOrigins = [
+  "http://localhost:3000", // Your frontend local development URL
+  "https://tictactoe.mushari-alothman.uk", // Your frontend deployment URL
+  "https://mushari-tic-tac-toe.vercel.app/",
+];
+
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow all origins for development; change this for production
-    methods: ["GET", "POST"],
+    origin: allowedOrigins,
+    methods: ["GET", "POST","PUT"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true,
   },
 });
+
 
 const mongoURI =
   "mongodb+srv://musharizh56:admin@cluster0.clvs4os.mongodb.net/TicTacToe";
