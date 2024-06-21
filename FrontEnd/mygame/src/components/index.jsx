@@ -46,6 +46,7 @@ export default function TicTacToe() {
     fetchGame();
 
     socket.on("gameUpdated", (game) => {
+      console.log("Received gameUpdated event:", game);
       setSquares(game.squares);
       setIsXTurn(game.isXTurn);
       setGameOver(game.isGameOver);
