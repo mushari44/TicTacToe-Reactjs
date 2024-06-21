@@ -24,7 +24,7 @@ export default function TicTacToe() {
     async function fetchGame() {
       try {
         const response = await axios.get(
-          "https://tic-tac-toe-server1.vercel.app/"
+          "https://tic-tac-toe-server1.vercel.app"
         );
         const game = response.data[0];
         if (game) {
