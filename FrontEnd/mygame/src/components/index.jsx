@@ -94,7 +94,7 @@ export default function TicTacToe() {
           }
         );
       } catch (error) {
-        console.log("Error updating game:", error);
+        console.log("Error updating game: ", error);
       }
     } else if (!gameOver) {
       setMessage("Square already clicked");
