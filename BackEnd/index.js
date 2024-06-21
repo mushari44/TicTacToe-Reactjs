@@ -13,6 +13,7 @@ const allowedOrigins = [
   "https://tic-tac-toe-server.mushari-alothman.uk",
   "https://mushari-tic-tac-toe.vercel.app",
 ];
+app.use(cors());
 
 const io = new Server(server, {
   cors: {
@@ -52,7 +53,6 @@ const gameSchema = new mongoose.Schema({
 
 const Game = mongoose.model("Game", gameSchema);
 
-app.use(cors());
 app.use(express.json());
 
 app.get("/", async (req, res) => {
