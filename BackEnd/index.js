@@ -8,8 +8,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST", "PUT"],
+    origin: "*", // Allow all origins for development; change this for production
+    methods: ["GET", "POST"],
   },
 });
 
@@ -20,14 +20,6 @@ mongoose
   .connect(process.env.MONGODB_URI || mongoURI)
   .then(async () => {
     console.log("Connected to MongoDB");
-
-    // Fetch and log the document by ID after a successful connection
-    const game = await Game.findById("666be9bc9f37c18bea5daab9");
-    if (game) {
-      console.log("Fetched game by ID:", game);
-    } else {
-      console.log("Game not found with the specified ID.");
-    }
   })
   .catch((error) => {
     console.error("Error connecting to MongoDB: ", error);
@@ -112,7 +104,7 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
