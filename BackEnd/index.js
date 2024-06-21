@@ -6,13 +6,28 @@ const { Server } = require("socket.io");
 
 const app = express();
 app.use(express.json());
-app.use(cors());
 
 const server = http.createServer(app);
 const allowedOrigins = [
   "http://localhost:3000", // Your frontend local development URL
   "https://tictactoe.mushari-alothman.uk/", // Your frontend deployment URL
+  "https://tic-tac-toe-server1-a977e7db17f2.herokuapp.com/",
 ];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT"], // Add other methods your frontend uses
+  allowedHeaders: ["Content-Type"],
+  credentials: true, // Enable credentials (cookies, authorization headers) cross-origin
+};
+
+app.use(cors(corsOptions));
 
 const io = new Server(server, {
   cors: {
@@ -22,12 +37,15 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+
 io.on("connection", (socket) => {
   console.log("A user connected");
+
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });
 });
+
 const mongoURI =
   "mongodb+srv://musharizh56:admin@cluster0.clvs4os.mongodb.net/TicTacToe";
 
@@ -80,7 +98,7 @@ app.put("/restart-game", async (req, res) => {
       game.isXTurn = true;
       game.isGameOver = false;
       await game.save();
-      io.emit("gameUpdated", game);
+      io.emit("gameUpdated", game); // Emitting the game update event
       res.status(200).json(game);
     } else {
       res.status(404).json({ error: "Game not found" });
@@ -99,7 +117,7 @@ app.put("/update-game", async (req, res) => {
       game.isXTurn = isXTurn;
       game.isGameOver = isGameOver;
       await game.save();
-      io.emit("gameUpdated", game);
+      io.emit("gameUpdated", game); // Emitting the game update event
       res.status(200).json(game);
     } else {
       res.status(404).json({ error: "Game not found" });
