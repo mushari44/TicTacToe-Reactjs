@@ -3,7 +3,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import "./styles.css";
 
-const socket = io("https://tic-tac-toe-server1.vercel.app");
+const socket = io("https://tic-tac-toe-server1.vercel.app/");
 
 function Square({ value, onClick }) {
   return (
@@ -24,7 +24,7 @@ export default function TicTacToe() {
     async function fetchGame() {
       try {
         const response = await axios.get(
-          "https://tic-tac-toe-server1.vercel.app"
+          "https://tic-tac-toe-server1.vercel.app/"
         );
         const game = response.data[0];
         if (game) {
