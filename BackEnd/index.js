@@ -17,7 +17,7 @@ const allowedOrigins = [
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: "*",
     methods: ["GET", "POST", "PUT", "HEAD"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
