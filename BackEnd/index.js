@@ -8,43 +8,14 @@ const app = express();
 app.use(express.json());
 
 const server = http.createServer(app);
-const allowedOrigins = [
-  "http://localhost:3000", // Your frontend local development URL
-  "https://tictactoe.mushari-alothman.uk/", // Your frontend deployment URL
-  "https://tic-tac-toe-server1-a977e7db17f2.herokuapp.com/",
-  "https://tic-tac-toe-server1-a977e7db17f2.herokuapp.com/socket.io/",
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT"], // Add other methods your frontend uses
-  allowedHeaders: ["Content-Type"],
-  credentials: true, // Enable credentials (cookies, authorization headers) cross-origin
-};
-
 app.use(cors(corsOptions));
-
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: "*",
     methods: ["GET", "POST", "PUT", "HEAD"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
   },
-});
-
-io.on("connection", (socket) => {
-  console.log("A user connected");
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
 });
 
 const mongoURI =
@@ -128,6 +99,13 @@ app.put("/update-game", async (req, res) => {
   }
 });
 
+io.on("connection", (socket) => {
+  console.log("A user connected");
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
