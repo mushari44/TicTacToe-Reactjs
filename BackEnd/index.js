@@ -20,14 +20,17 @@ const allowedOrigins = [
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
-    methods: ["GET", "POST"
-      
-    ],
+    methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
   },
 });
-
+io.on("connection", (socket) => {
+  console.log("A user connected");
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
 const mongoURI =
   "mongodb+srv://musharizh56:admin@cluster0.clvs4os.mongodb.net/TicTacToe";
 
@@ -107,13 +110,6 @@ app.put("/update-game", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Error updating game" });
   }
-});
-
-io.on("connection", (socket) => {
-  console.log("A user connected");
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
 });
 
 const PORT = process.env.PORT || 5000;
