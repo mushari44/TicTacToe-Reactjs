@@ -12,6 +12,7 @@ const allowedOrigins = [
   "http://localhost:3000", // Your frontend local development URL
   "https://tictactoe.mushari-alothman.uk/", // Your frontend deployment URL
   "https://tic-tac-toe-server1-a977e7db17f2.herokuapp.com/",
+  "https://tic-tac-toe-server1-a977e7db17f2.herokuapp.com/socket.io/",
 ];
 
 const corsOptions = {
