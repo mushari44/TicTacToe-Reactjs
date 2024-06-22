@@ -17,7 +17,6 @@ const io = new Server(server, {
     credentials: true,
   },
 });
-
 io.on("connection", (socket) => {
   console.log("A user connected");
 
@@ -43,12 +42,6 @@ const gameSchema = new mongoose.Schema({
     type: [String],
     default: Array(9).fill(""),
   },
-  playerX: {
-    type: String,
-  },
-  playerO: {
-    type: String,
-  },
   isXTurn: {
     type: Boolean,
     default: true,
@@ -61,46 +54,11 @@ const gameSchema = new mongoose.Schema({
 
 const Game = mongoose.model("Game", gameSchema);
 
-// Middleware to authenticate player moves
-function authenticatePlayer(req, res, next) {
-  const { gameId, playerId } = req.body;
-  if (!gameId || !playerId) {
-    return res
-      .status(400)
-      .json({ error: "Game ID and Player ID are required" });
-  }
-
-  Game.findById(gameId)
-    .then((game) => {
-      if (!game) {
-        return res.status(404).json({ error: "Game not found" });
-      }
-
-      if (
-        (game.isXTurn && playerId !== game.playerX) ||
-        (!game.isXTurn && playerId !== game.playerO)
-      ) {
-        return res.status(403).json({ error: "Not your turn" });
-      }
-
-      req.game = game;
-      next();
-    })
-    .catch((error) => {
-      console.error("Error authenticating player:", error);
-      res.status(500).json({ error: "Server error" });
-    });
-}
-
-// Routes for handling game logic
 app.get("/", async (req, res) => {
   try {
     let game = await Game.findOne();
     if (!game) {
-      game = new Game({
-        playerX: "Player 1", // Default player names
-        playerO: "Player 2",
-      });
+      game = new Game();
       await game.save();
     }
     res.status(200).json([game]);
@@ -109,52 +67,41 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.put("/make-move", authenticatePlayer, async (req, res) => {
-  const {
-    game,
-    body: { index },
-  } = req;
+app.put("/restart-game", async (req, res) => {
+  const { id } = req.body;
   try {
-    if (game.squares[index] !== "") {
-      return res.status(400).json({ error: "Square already filled" });
+    const game = await Game.findById(id);
+    if (game) {
+      game.squares = Array(9).fill("");
+      game.isXTurn = true;
+      game.isGameOver = false;
+      await game.save();
+      io.emit("gameUpdated", game); // Emitting the game update event
+      res.status(200).json(game);
+    } else {
+      res.status(404).json({ error: "Game not found" });
     }
-
-    // Update game state
-    game.squares[index] = game.isXTurn ? "X" : "O";
-    game.isXTurn = !game.isXTurn;
-    await game.save();
-
-    // Emit event to update frontend clients
-    io.emit("gameUpdated", game);
-
-    res.status(200).json(game);
   } catch (error) {
-    console.error("Error making move:", error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Error updating game" });
   }
 });
 
-app.put("/restart-game", async (req, res) => {
-  const { gameId } = req.body;
+app.put("/update-game", async (req, res) => {
+  const { id, squares, isXTurn, isGameOver } = req.body;
   try {
-    const game = await Game.findById(gameId);
-    if (!game) {
-      return res.status(404).json({ error: "Game not found" });
+    const game = await Game.findById(id);
+    if (game) {
+      game.squares = squares;
+      game.isXTurn = isXTurn;
+      game.isGameOver = isGameOver;
+      await game.save();
+      io.emit("gameUpdated", game); // Emitting the game update event
+      res.status(200).json(game);
+    } else {
+      res.status(404).json({ error: "Game not found" });
     }
-
-    // Reset game state
-    game.squares = Array(9).fill("");
-    game.isXTurn = true;
-    game.isGameOver = false;
-    await game.save();
-
-    // Emit event to update frontend clients
-    io.emit("gameUpdated", game);
-
-    res.status(200).json(game);
   } catch (error) {
-    console.error("Error restarting game:", error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Error updating game" });
   }
 });
 
