@@ -89,7 +89,7 @@ export default function TicTacToe() {
             id: gameId,
             squares: newSquares,
             isXTurn: newTurn,
-            isGameOver: getWinner(newSquares) || !newSquares.includes(""),
+            isGameOver: !!getWinner(newSquares) || !newSquares.includes(""),
           }
         );
       } catch (error) {
