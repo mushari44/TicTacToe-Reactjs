@@ -160,9 +160,11 @@ export default function TicTacToe() {
         <Square value={squares[7]} onClick={() => handleOnClick(7)} />
         <Square value={squares[8]} onClick={() => handleOnClick(8)} />
       </div>
-      <button className="restart-button" onClick={handleRestart}>
-        RESTART
-      </button>
+      {gameOver ? (
+        <button className="restart-button" onClick={handleRestart}>
+          RESTART
+        </button>
+      ) : null}
     </div>
   );
 }
