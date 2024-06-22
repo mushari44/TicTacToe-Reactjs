@@ -3,7 +3,9 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import "./styles.css";
 
-const socket = io("https://tictactoe-server.mushari-alothman.uk");
+const socket = io("https://tictactoe-server.mushari-alothman.uk", {
+  withCredentials: true,
+});
 
 function Square({ value, onClick }) {
   return (
@@ -61,11 +63,11 @@ export default function TicTacToe({ playerId }) {
   }, []);
 
   async function handleOnClick(index) {
-    if (!gameOver && game && game.squares[index] === "") {
-      const newSquares = [...game.squares];
-      const currentPlayer = game.isXTurn ? playerX : playerO;
+    try {
+      if (!gameOver && game && game.squares[index] === "") {
+        const newSquares = [...game.squares];
+        newSquares[index] = game.isXTurn ? "X" : "O";
 
-      try {
         await axios.put(
           "https://tictactoe-server.mushari-alothman.uk/make-move",
           {
@@ -74,9 +76,16 @@ export default function TicTacToe({ playerId }) {
             index,
           }
         );
-      } catch (error) {
-        console.log("Error making move:", error);
+
+        // Optimistically update the UI
+        setGame((prevGame) => ({
+          ...prevGame,
+          squares: newSquares,
+          isXTurn: !prevGame.isXTurn,
+        }));
       }
+    } catch (error) {
+      console.log("Error making move:", error);
     }
   }
 
@@ -88,6 +97,14 @@ export default function TicTacToe({ playerId }) {
           gameId: game._id,
         }
       );
+
+      // Reset local game state after restart
+      setGame((prevGame) => ({
+        ...prevGame,
+        squares: Array(9).fill(""),
+        isXTurn: true,
+        isGameOver: false,
+      }));
     } catch (error) {
       console.log("Error restarting game:", error);
     }
