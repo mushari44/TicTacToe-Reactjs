@@ -49,7 +49,7 @@ const gameSchema = new mongoose.Schema({
   },
   playerO: {
     type: String,
-    default: false, 
+    default: false,
     required: true,
   },
   isXTurn: {
@@ -63,9 +63,6 @@ const gameSchema = new mongoose.Schema({
 });
 
 const Game = mongoose.model("Game", gameSchema);
-
-let game = new Game();
-game.save();
 
 // Example routes for handling game logic
 // Example of handling moves
