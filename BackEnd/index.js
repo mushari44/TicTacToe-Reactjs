@@ -99,7 +99,7 @@ app.put("/make-move", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-const Game = mongoose.model("Game", gameSchema);
+// const Game = mongoose.model("Game", gameSchema);
 
 app.get("/", async (req, res) => {
   try {
