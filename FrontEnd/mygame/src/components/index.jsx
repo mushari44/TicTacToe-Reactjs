@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 import "./styles.css";
@@ -19,7 +19,7 @@ export default function TicTacToe() {
   const [message, setMessage] = useState("Next turn is X");
   const [gameOver, setGameOver] = useState(false);
   const [gameId, setGameId] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(true); 
   useEffect(() => {
     async function fetchGame() {
       try {
@@ -40,6 +40,8 @@ export default function TicTacToe() {
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        setIsLoading(false); 
       }
     }
 
@@ -100,6 +102,20 @@ export default function TicTacToe() {
     }
   }
 
+  async function handleRestart() {
+    try {
+      await axios.put(
+        "https://tictactoe-server.mushari-alothman.uk/restart-game",
+        {
+          id: gameId,
+        }
+      );
+      // No need to manually update state here; wait for socket event
+    } catch (error) {
+      console.log("Error restarting game:", error);
+    }
+  }
+
   function getWinner(squares) {
     const winningPatterns = [
       [0, 1, 2],
@@ -124,43 +140,35 @@ export default function TicTacToe() {
     return null;
   }
 
-  async function handleRestart() {
-    try {
-      await axios.put(
-        "https://tictactoe-server.mushari-alothman.uk/restart-game",
-        {
-          id: gameId,
-        }
-      );
-      // No need to manually update state here; wait for socket event
-    } catch (error) {
-      console.log("Error restarting game:", error);
-    }
-  }
-
   return (
     <div className="tic-tac-toe-container">
-      <div>{message && <h1>{message}</h1>}</div>
-      <div className="row">
-        <Square value={squares[0]} onClick={() => handleOnClick(0)} />
-        <Square value={squares[1]} onClick={() => handleOnClick(1)} />
-        <Square value={squares[2]} onClick={() => handleOnClick(2)} />
-      </div>
-      <div className="row">
-        <Square value={squares[3]} onClick={() => handleOnClick(3)} />
-        <Square value={squares[4]} onClick={() => handleOnClick(4)} />
-        <Square value={squares[5]} onClick={() => handleOnClick(5)} />
-      </div>
-      <div className="row">
-        <Square value={squares[6]} onClick={() => handleOnClick(6)} />
-        <Square value={squares[7]} onClick={() => handleOnClick(7)} />
-        <Square value={squares[8]} onClick={() => handleOnClick(8)} />
-      </div>
-      {gameOver ? (
-        <button className="restart-button" onClick={handleRestart}>
-          RESTART
-        </button>
-      ) : null}
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <>
+          <div>{message && <h1>{message}</h1>}</div>
+          <div className="row">
+            <Square value={squares[0]} onClick={() => handleOnClick(0)} />
+            <Square value={squares[1]} onClick={() => handleOnClick(1)} />
+            <Square value={squares[2]} onClick={() => handleOnClick(2)} />
+          </div>
+          <div className="row">
+            <Square value={squares[3]} onClick={() => handleOnClick(3)} />
+            <Square value={squares[4]} onClick={() => handleOnClick(4)} />
+            <Square value={squares[5]} onClick={() => handleOnClick(5)} />
+          </div>
+          <div className="row">
+            <Square value={squares[6]} onClick={() => handleOnClick(6)} />
+            <Square value={squares[7]} onClick={() => handleOnClick(7)} />
+            <Square value={squares[8]} onClick={() => handleOnClick(8)} />
+          </div>
+          {gameOver ? (
+            <button className="restart-button" onClick={handleRestart}>
+              RESTART
+            </button>
+          ) : null}
+        </>
+      )}
     </div>
   );
 }
