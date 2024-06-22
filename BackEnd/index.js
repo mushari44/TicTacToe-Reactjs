@@ -45,11 +45,9 @@ const gameSchema = new mongoose.Schema({
   },
   playerX: {
     type: String,
-    required: true,
   },
   playerO: {
     type: String,
-    required: true,
   },
   isXTurn: {
     type: Boolean,
