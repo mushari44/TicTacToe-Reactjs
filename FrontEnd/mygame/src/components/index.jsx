@@ -13,9 +13,8 @@ function Square({ value, onClick }) {
   );
 }
 
-export default function TicTacToe() {
+export default function TicTacToe({ playerId }) {
   const [squares, setSquares] = useState(Array(9).fill(""));
-  const [isXTurn, setIsXTurn] = useState(true);
   const [message, setMessage] = useState("Next turn is X");
   const [gameOver, setGameOver] = useState(false);
   const [gameId, setGameId] = useState(null);
@@ -30,13 +29,12 @@ export default function TicTacToe() {
         if (game) {
           setSquares(game.squares);
           setGameId(game._id);
-          setIsXTurn(game.isXTurn);
-          setGameOver(game.isGameOver);
           setMessage(
             game.isGameOver
               ? "Game OVER!!"
               : `Next turn is ${game.isXTurn ? "X" : "O"}`
           );
+          setGameOver(game.isGameOver);
         }
       } catch (error) {
         console.log(error);
@@ -47,13 +45,12 @@ export default function TicTacToe() {
 
     socket.on("gameUpdated", (game) => {
       setSquares(game.squares);
-      setIsXTurn(game.isXTurn);
-      setGameOver(game.isGameOver);
       setMessage(
         game.isGameOver
           ? "Game OVER!"
           : `Next turn is ${game.isXTurn ? "X" : "O"}`
       );
+      setGameOver(game.isGameOver);
     });
 
     return () => {
@@ -61,67 +58,24 @@ export default function TicTacToe() {
     };
   }, []);
 
-  useEffect(() => {
-    const winner = getWinner(squares);
-    if (winner) {
-      setMessage(`${winner} won!!`);
-      setGameOver(true);
-    } else if (!squares.includes("")) {
-      setMessage("DRAW !");
-      setGameOver(true);
-    } else {
-      setMessage(`Next turn is ${isXTurn ? "X" : "O"}`);
-    }
-  }, [squares]);
-
   async function handleOnClick(index) {
     if (!gameOver && squares[index] === "") {
       const newSquares = [...squares];
-      newSquares[index] = isXTurn ? "X" : "O";
-      setSquares(newSquares);
-      const newTurn = !isXTurn;
-      setIsXTurn(newTurn);
+      newSquares[index] = playerId === game.playerX ? "X" : "O";
 
       try {
         await axios.put(
-          "https://tictactoe-server.mushari-alothman.uk/update-game",
+          "https://tictactoe-server.mushari-alothman.uk/make-move",
           {
-            id: gameId,
-            squares: newSquares,
-            isXTurn: newTurn,
-            isGameOver: !!getWinner(newSquares) || !newSquares.includes(""),
+            gameId,
+            playerId,
+            index,
           }
         );
       } catch (error) {
-        console.log("Error updating game:", error);
-      }
-    } else if (!gameOver) {
-      setMessage("Square already clicked");
-    }
-  }
-
-  function getWinner(squares) {
-    const winningPatterns = [
-      [0, 1, 2],
-      [0, 3, 6],
-      [3, 4, 5],
-      [6, 7, 8],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
-      [1, 4, 7],
-    ];
-    for (let i = 0; i < winningPatterns.length; i++) {
-      const [x, y, z] = winningPatterns[i];
-      if (
-        squares[x] &&
-        squares[x] === squares[y] &&
-        squares[x] === squares[z]
-      ) {
-        return squares[x];
+        console.log("Error making move:", error);
       }
     }
-    return null;
   }
 
   async function handleRestart() {
@@ -129,10 +83,9 @@ export default function TicTacToe() {
       await axios.put(
         "https://tictactoe-server.mushari-alothman.uk/restart-game",
         {
-          id: gameId,
+          gameId,
         }
       );
-      // No need to manually update state here; wait for socket event
     } catch (error) {
       console.log("Error restarting game:", error);
     }
