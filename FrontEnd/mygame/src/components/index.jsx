@@ -126,17 +126,13 @@ export default function TicTacToe() {
 
   async function handleRestart() {
     try {
-      const response = await axios.put(
+      await axios.put(
         "https://tictactoe-server.mushari-alothman.uk/restart-game",
         {
           id: gameId,
         }
       );
-      const game = response.data;
-      setIsXTurn(game.isXTurn);
-      setGameOver(game.isGameOver);
-      setMessage("Next turn is X");
-      setSquares(game.squares);
+      // No need to manually update state here; wait for socket event
     } catch (error) {
       console.log("Error restarting game:", error);
     }
