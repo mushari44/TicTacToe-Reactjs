@@ -45,10 +45,12 @@ const gameSchema = new mongoose.Schema({
   playerX: {
     type: String,
     required: true,
+    default: true,
   },
   playerO: {
     type: String,
     required: true,
+    default: false,
   },
   isXTurn: {
     type: Boolean,
@@ -99,8 +101,6 @@ app.put("/make-move", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-// const Game = mongoose.model("Game", gameSchema);
-
 app.get("/", async (req, res) => {
   try {
     let game = await Game.findOne();
