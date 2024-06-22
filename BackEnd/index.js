@@ -76,6 +76,7 @@ app.put("/restart-game", async (req, res) => {
       game.isXTurn = true;
       game.isGameOver = false;
       await game.save();
+      io.emit("gameUpdated", game); // Emitting the game update event
       res.status(200).json(game);
     } else {
       res.status(404).json({ error: "Game not found" });
