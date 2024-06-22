@@ -44,10 +44,12 @@ const gameSchema = new mongoose.Schema({
   },
   playerX: {
     type: String,
+    default: true,
     required: true,
   },
   playerO: {
     type: String,
+    default: false, 
     required: true,
   },
   isXTurn: {
@@ -61,6 +63,9 @@ const gameSchema = new mongoose.Schema({
 });
 
 const Game = mongoose.model("Game", gameSchema);
+
+let game = new Game();
+game.save();
 
 // Example routes for handling game logic
 // Example of handling moves
@@ -110,6 +115,10 @@ app.get("/", async (req, res) => {
     }
     res.status(200).json([game]);
   } catch (error) {
+    let game = await Game.findOne();
+    game = new Game();
+    await game.save();
+    console.log("DONE");
     res.status(500).json({ error: "Error fetching game" });
   }
 });
