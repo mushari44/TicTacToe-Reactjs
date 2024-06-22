@@ -46,7 +46,6 @@ export default function TicTacToe() {
     fetchGame();
 
     socket.on("gameUpdated", (game) => {
-
       setSquares(game.squares);
       setIsXTurn(game.isXTurn);
       setGameOver(game.isGameOver);
@@ -90,7 +89,7 @@ export default function TicTacToe() {
             id: gameId,
             squares: newSquares,
             isXTurn: newTurn,
-            isGameOver: !!getWinner(newSquares) || !newSquares.includes(""),
+            isGameOver: getWinner(newSquares) || !newSquares.includes(""),
           }
         );
       } catch (error) {
@@ -127,16 +126,17 @@ export default function TicTacToe() {
 
   async function handleRestart() {
     try {
-      await axios.put(
+      const response = await axios.put(
         "https://tictactoe-server.mushari-alothman.uk/restart-game",
         {
           id: gameId,
         }
       );
-      setIsXTurn(true);
-      setGameOver(false);
+      const game = response.data;
+      setIsXTurn(game.isXTurn);
+      setGameOver(game.isGameOver);
       setMessage("Next turn is X");
-      setSquares(Array(9).fill(""));
+      setSquares(game.squares);
     } catch (error) {
       console.log("Error restarting game:", error);
     }
