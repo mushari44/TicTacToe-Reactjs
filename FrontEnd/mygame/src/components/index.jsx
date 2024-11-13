@@ -3,7 +3,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import "./styles.css";
 
-const socket = io("https://tictactoe-server.mushari-alothman.uk");
+const socket = io("https://tictactoe-server-n239.onrender.com/");
 
 function Square({ value, onClick }) {
   return (
@@ -24,7 +24,7 @@ export default function TicTacToe() {
     async function fetchGame() {
       try {
         const response = await axios.get(
-          "https://tictactoe-server.mushari-alothman.uk/"
+          "https://tictactoe-server-n239.onrender.com/"
         );
         const game = response.data[0];
         if (game) {
@@ -86,7 +86,7 @@ export default function TicTacToe() {
 
       try {
         await axios.put(
-          "https://tictactoe-server.mushari-alothman.uk/update-game",
+          "https://tictactoe-server-n239.onrender.com/update-game",
           {
             id: gameId,
             squares: newSquares,
@@ -105,7 +105,7 @@ export default function TicTacToe() {
   async function handleRestart() {
     try {
       await axios.put(
-        "https://tictactoe-server.mushari-alothman.uk/restart-game",
+        "https://tictactoe-server-n239.onrender.com/restart-game",
         {
           id: gameId,
         }
